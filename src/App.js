@@ -1,32 +1,40 @@
 import React from 'react';
 
-import {Cards,Chart,CountryPicker} from './components';
+import { Cards, CountryPicker, Chart } from './components';
+import { fetchData } from './api/';
 import styles from './App.module.css';
-import {fetchData} from './api';
 
-class App extends React.Component{
+import image from './images/covid-image.png';
 
+class App extends React.Component {
   state = {
-    data:{},
+    data: {},
+    country: '',
   }
 
+  async componentDidMount() {
+    const data = await fetchData();
 
-
-  //using class based components ,the bets place to fetch data is componentDidMount()
-  async componentDidMount(){
-    const fetchedData = await fetchData();//await cause of asynchronous func
-    this.setState({data:fetchedData});
+    this.setState({ data });
   }
-  render(){
-    const {data} = this.state;
-    return(
+
+  handleCountryChange = async (country) => {
+    const data = await fetchData(country);
+
+    this.setState({ data, country: country });
+  }
+
+  render() {
+    const { data, country } = this.state;
+
+    return (
       <div className={styles.container}>
-        <Cards data={data}/>
-        <CountryPicker />
-        <Chart />
-        
+        <img className={styles.image} src={image} alt="COVID-19" />
+        <Cards data={data} />
+        <CountryPicker handleCountryChange={this.handleCountryChange} />
+        <Chart data={data} country={country} /> 
       </div>
-    )
+    );
   }
 }
 
